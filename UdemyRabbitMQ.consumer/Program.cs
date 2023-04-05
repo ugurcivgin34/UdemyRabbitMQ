@@ -9,7 +9,7 @@ public class Program
     static void Main(string[] args)
     {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.Uri = new Uri("amqps://yjvxzyim:8SIohLh_WS7SCqCKNVJr66-BY1gQgrlh@woodpecker.rmq.cloudamqp.com/yjvxzyim");
+        factory.Uri = new Uri("amqps://uidvbmmg:xYlxfwU1dk6FwGtwxNj8jm1qWjdlwj9U@shark.rmq.cloudamqp.com/uidvbmmg");
 
         using var connection = factory.CreateConnection();
 
