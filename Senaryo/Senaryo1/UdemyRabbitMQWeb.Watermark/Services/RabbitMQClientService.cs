@@ -17,13 +17,11 @@ namespace UdemyRabbitMQWeb.Watermark.Services
         {
             _connectionFactory = connectionFactory;
             _logger = logger;
-            Connect();
-        }
 
+        }
         public IModel Connect()
         {
             _connection = _connectionFactory.CreateConnection();
-
 
             if (_channel is { IsOpen: true })
             {
@@ -41,11 +39,8 @@ namespace UdemyRabbitMQWeb.Watermark.Services
 
             _logger.LogInformation("RabbitMQ ile bağlantı kuruldu...");
 
-
             return _channel;
-
         }
-
         public void Dispose()
         {
             _channel?.Close();
