@@ -6,6 +6,7 @@ namespace UdemyRabbitMQWeb.Watermark.Models
 {
     public class Product
     {
+
         [Key]
         public int Id { get; set; }
         [StringLength(100)]
@@ -15,6 +16,6 @@ namespace UdemyRabbitMQWeb.Watermark.Models
         [Range(1, 100)]
         public int Stock { get; set; }
         [StringLength(100)]
-        public string PictureUrl { get; set; }
+        public string? ImageName { get; set; }
     }
 }

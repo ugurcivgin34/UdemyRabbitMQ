@@ -12,7 +12,8 @@ namespace Publisher
         Warning = 3,
         Info = 4
     }
-    class Program
+    static class Program
+
     {
         static void Main(string[] args)
         {

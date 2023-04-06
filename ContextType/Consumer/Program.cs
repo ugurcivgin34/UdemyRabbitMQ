@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace Consumer
 {
-    class Program
+    static class Program
     {
         static void Main(string[] args)
         {
