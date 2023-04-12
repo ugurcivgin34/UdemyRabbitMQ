@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using RabbitMQ.Client;
+using System.Configuration;
 using UdemyRabbitMQWeb.FileCreateWorkerService.Models;
+using UdemyRabbitMQWeb.FileCreateWorkerService.Services;
 
 internal class Program
 {
@@ -21,6 +24,8 @@ internal class Program
 
         }).AddEntityFrameworkStores<AppDbContext>();
 
+        builder.Services.AddSingleton(sp => new ConnectionFactory() { Uri = new Uri(builder.Configuration.GetConnectionString("RabbitMQ")), DispatchConsumersAsync = true });
+        builder.Services.AddSingleton<RabbitMQClientService>();
 
         var app = builder.Build();
 
