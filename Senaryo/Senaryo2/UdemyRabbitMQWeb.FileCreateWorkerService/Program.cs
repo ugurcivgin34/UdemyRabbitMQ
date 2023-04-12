@@ -25,6 +25,7 @@ internal class Program
         }).AddEntityFrameworkStores<AppDbContext>();
 
         builder.Services.AddSingleton(sp => new ConnectionFactory() { Uri = new Uri(builder.Configuration.GetConnectionString("RabbitMQ")), DispatchConsumersAsync = true });
+        builder.Services.AddSingleton<RabbitMQPublisher>();
         builder.Services.AddSingleton<RabbitMQClientService>();
 
         var app = builder.Build();

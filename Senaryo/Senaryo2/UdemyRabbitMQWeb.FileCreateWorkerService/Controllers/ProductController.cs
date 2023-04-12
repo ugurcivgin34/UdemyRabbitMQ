@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UdemyRabbitMQWeb.FileCreateWorkerService.Models;
+using UdemyRabbitMQWeb.FileCreateWorkerService.Models.Shared;
+using UdemyRabbitMQWeb.FileCreateWorkerService.Services;
 
 namespace UdemyRabbitMQWeb.FileCreateWorkerService.Controllers
 {
@@ -12,11 +14,13 @@ namespace UdemyRabbitMQWeb.FileCreateWorkerService.Controllers
 
         private readonly AppDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly RabbitMQPublisher _rabbitMQPublisher;
 
-        public ProductController(AppDbContext context, UserManager<IdentityUser> userManager)
+        public ProductController(AppDbContext context, UserManager<IdentityUser> userManager, RabbitMQPublisher rabbitMQPublisher)
         {
             _context = context;
             _userManager = userManager;
+            _rabbitMQPublisher = rabbitMQPublisher;
         }
 
         public IActionResult Index()
@@ -40,7 +44,8 @@ namespace UdemyRabbitMQWeb.FileCreateWorkerService.Controllers
             await _context.UserFiles.AddAsync(userfile);
 
             await _context.SaveChangesAsync();
-            //rabbitMQ'ya messaj gönder
+
+            _rabbitMQPublisher.Publish(new CreateExcelMessage() { FileId = userfile.Id, UserId = user.Id });
             TempData["StartCreatingExcel"] = true; //Bir requestten diğer bir requeste data taşımak için TempData kullandık
 
             return RedirectToAction(nameof(Files));
