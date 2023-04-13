@@ -15,14 +15,12 @@ namespace UdemyRabbitMQWeb.FileCreateWorkerService.Controllers
         private readonly AppDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RabbitMQPublisher _rabbitMQPublisher;
-
         public ProductController(AppDbContext context, UserManager<IdentityUser> userManager, RabbitMQPublisher rabbitMQPublisher)
         {
             _context = context;
             _userManager = userManager;
             _rabbitMQPublisher = rabbitMQPublisher;
         }
-
         public IActionResult Index()
         {
             return View();
@@ -32,7 +30,7 @@ namespace UdemyRabbitMQWeb.FileCreateWorkerService.Controllers
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
 
-            var fileName = $"product-excel-{Guid.NewGuid().ToString().Substring(1, 10)}"; //Dosya ismi
+            var fileName = $"product-excel-{Guid.NewGuid().ToString().Substring(1, 10)}";
 
             UserFile userfile = new()
             {
@@ -45,18 +43,16 @@ namespace UdemyRabbitMQWeb.FileCreateWorkerService.Controllers
 
             await _context.SaveChangesAsync();
 
-            _rabbitMQPublisher.Publish(new CreateExcelMessage() { FileId = userfile.Id, UserId = user.Id });
-            TempData["StartCreatingExcel"] = true; //Bir requestten diğer bir requeste data taşımak için TempData kullandık
+            _rabbitMQPublisher.Publish(new CreateExcelMessage() { FileId = userfile.Id });
+            TempData["StartCreatingExcel"] = true;
 
             return RedirectToAction(nameof(Files));
-
         }
-
         public async Task<IActionResult> Files()
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
-            var result = await _context.UserFiles.Where(x => x.UserId == user.Id).ToListAsync();
-            return View(result);
+
+            return View(await _context.UserFiles.Where(x => x.UserId == user.Id).ToListAsync());
         }
     }
 }
