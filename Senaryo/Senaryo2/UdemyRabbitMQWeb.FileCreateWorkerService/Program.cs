@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using System.Configuration;
+using UdemyRabbitMQWeb.FileCreateWorkerService.Hubs;
 using UdemyRabbitMQWeb.FileCreateWorkerService.Models;
 using UdemyRabbitMQWeb.FileCreateWorkerService.Services;
 
@@ -12,6 +13,7 @@ internal class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddControllersWithViews();
+        builder.Services.AddSignalR();
 
         builder.Services.AddDbContext<AppDbContext>(options =>
         {
@@ -44,7 +46,6 @@ internal class Program
             }
         }
 
-
         if (!app.Environment.IsDevelopment())
         {
             app.UseExceptionHandler("/Home/Error");
@@ -62,7 +63,7 @@ internal class Program
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
-
+        app.MapHub<MyHub>("/MyHub");
         app.Run();
     }
 }

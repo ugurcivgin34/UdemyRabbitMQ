@@ -1,11 +1,11 @@
+using ClosedXML.Excel;
 using FileCreateWorkerService.Models;
-using RabbitMQ.Client.Events;
-using System.Data;
-using System.Text.Json;
-using System.Text;
 using FileCreateWorkerService.Services;
 using RabbitMQ.Client;
-using ClosedXML.Excel;
+using RabbitMQ.Client.Events;
+using System.Data;
+using System.Text;
+using System.Text.Json;
 using UdemyRabbitMQWeb.FileCreateWorkerService.Models.Shared;
 
 namespace FileCreateWorkerService
@@ -37,7 +37,10 @@ namespace FileCreateWorkerService
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
+
             var consumer = new AsyncEventingBasicConsumer(_channel);
+
+            _channel.BasicConsume(RabbitMQClientService.QueueName, false, consumer);
 
             consumer.Received += Consumer_Received;
 
@@ -48,13 +51,17 @@ namespace FileCreateWorkerService
         {
             await Task.Delay(5000);
 
+
             var createExcelMessage = JsonSerializer.Deserialize<CreateExcelMessage>(Encoding.UTF8.GetString(@event.Body.ToArray()));
 
+
             using var ms = new MemoryStream();
+
 
             var wb = new XLWorkbook();
             var ds = new DataSet();
             ds.Tables.Add(GetTable("products"));
+            ;
 
             wb.Worksheets.Add(ds);
             wb.SaveAs(ms);
@@ -63,17 +70,17 @@ namespace FileCreateWorkerService
 
             multipartFormDataContent.Add(new ByteArrayContent(ms.ToArray()), "file", Guid.NewGuid().ToString() + ".xlsx");
 
-            var baseUrl = "https://localhost:44378/api/files";
+            var baseUrl = "https://localhost:7170/api/files";
 
             using (var httpClient = new HttpClient())
             {
 
-                var response = await httpClient.PostAsync($"{baseUrl}?fileId={createExcelMessage?.FileId}", multipartFormDataContent);
+                var response = await httpClient.PostAsync($"{baseUrl}?fileId={createExcelMessage.FileId}", multipartFormDataContent);
 
                 if (response.IsSuccessStatusCode)
                 {
 
-                    _logger.LogInformation($"File ( Id : {createExcelMessage?.FileId}) was created by successful");
+                    _logger.LogInformation($"File ( Id : {createExcelMessage.FileId}) was created by successful");
                     _channel.BasicAck(@event.DeliveryTag, false);
                 }
             }
